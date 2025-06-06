@@ -10,39 +10,31 @@ class Command(BaseCommand):
     help = "Load example championship structure with related data"
 
     def handle(self, *args, **kwargs):
-        # Clear existing data
         Championship.objects.all().delete()
         Class.objects.all().delete()
 
-        # Create Championship
         champ = Championship.objects.create(name="2025 Spring Championship")
 
-        # Create Rounds
         round1 = Round.objects.create(name="Opener", date=date(2025, 4, 1), championship=champ)
         round2 = Round.objects.create(name="Final Showdown", date=date(2025, 5, 15), championship=champ)
 
-        # Create Classes
         junior = Class.objects.create(name="Junior", base_price=30.00)
         senior = Class.objects.create(name="Senior", base_price=40.00)
         expert = Class.objects.create(name="Expert", base_price=50.00)
 
-        # Create Races
         race_a = Race.objects.create(name="Junior Heat", round=round1)
         race_b = Race.objects.create(name="Senior Sprint", round=round1)
         race_c = Race.objects.create(name="Final Heat", round=round2)
 
-        # Assign Race Classes
         RaceClass.objects.create(race=race_a, rider_class=junior)
         RaceClass.objects.create(race=race_b, rider_class=senior)
         RaceClass.objects.create(race=race_c, rider_class=expert)
 
-        # Schedule Classes
         ClassSchedule.objects.create(round=round1, rider_class=junior)
         ClassSchedule.objects.create(round=round1, rider_class=senior)
         ClassSchedule.objects.create(round=round2, rider_class=senior)
         ClassSchedule.objects.create(round=round2, rider_class=expert)
 
-        # Create Pricing Tiers
         tier1a = PricingTier.objects.create(name="Early Bird", round=round1, start_date=date(2025, 3, 1), end_date=date(2025, 3, 15))
         tier1b = PricingTier.objects.create(name="Standard", round=round1, start_date=date(2025, 3, 16), end_date=date(2025, 3, 31))
         tier1c = PricingTier.objects.create(name="Late", round=round1, start_date=date(2025, 4, 1), end_date=date(2025, 4, 7))
@@ -50,7 +42,6 @@ class Command(BaseCommand):
         tier2a = PricingTier.objects.create(name="Early Bird", round=round2, start_date=date(2025, 4, 10), end_date=date(2025, 4, 25))
         tier2b = PricingTier.objects.create(name="Standard", round=round2, start_date=date(2025, 4, 26), end_date=date(2025, 5, 10))
 
-        # Class Pricing - Round 1
         ClassPricing.objects.create(pricing_tier=tier1a, rider_class=junior, price=25.00)
         ClassPricing.objects.create(pricing_tier=tier1a, rider_class=senior, price=35.00)
         ClassPricing.objects.create(pricing_tier=tier1b, rider_class=junior, price=30.00)
@@ -58,10 +49,136 @@ class Command(BaseCommand):
         ClassPricing.objects.create(pricing_tier=tier1c, rider_class=junior, price=35.00)
         ClassPricing.objects.create(pricing_tier=tier1c, rider_class=senior, price=45.00)
 
-        # Class Pricing - Round 2
         ClassPricing.objects.create(pricing_tier=tier2a, rider_class=senior, price=38.00)
         ClassPricing.objects.create(pricing_tier=tier2a, rider_class=expert, price=45.00)
         ClassPricing.objects.create(pricing_tier=tier2b, rider_class=senior, price=43.00)
         ClassPricing.objects.create(pricing_tier=tier2b, rider_class=expert, price=50.00)
 
         self.stdout.write(self.style.SUCCESS('Demo championship data loaded successfully.'))
+
+
+# views.py (continued)
+from django.shortcuts import render
+from django.http import JsonResponse
+from app.models import Championship
+
+def demo_championship_view(request):
+    champ = Championship.objects.prefetch_related(
+        'rounds__races__race_classes__rider_class',
+        'rounds__pricing_tiers__class_prices__rider_class',
+        'rounds__class_schedules__rider_class'
+    ).first()
+
+    if not champ:
+        return JsonResponse({"error": "No championship found."}, status=404)
+
+    data = {
+        "name": champ.name,
+        "rounds": []
+    }
+
+    for rnd in champ.rounds.all():
+        round_data = {
+            "name": rnd.name,
+            "date": rnd.date,
+            "races": [],
+            "classes": list(set(
+                cs.rider_class.name for cs in rnd.class_schedules.all()
+            )),
+            "pricing_tiers": []
+        }
+
+        for race in rnd.races.all():
+            race_data = {
+                "name": race.name,
+                "classes": [rc.rider_class.name for rc in race.race_classes.all()]
+            }
+            round_data["races"].append(race_data)
+
+        for tier in rnd.pricing_tiers.all():
+            tier_data = {
+                "name": tier.name,
+                "start": tier.start_date,
+                "end": tier.end_date,
+                "prices": [
+                    {"class": cp.rider_class.name, "price": float(cp.price)}
+                    for cp in tier.class_prices.all()
+                ]
+            }
+            round_data["pricing_tiers"].append(tier_data)
+
+        data["rounds"].append(round_data)
+
+    return render(request, 'demo_dashboard.html', {'championship': data})
+
+# urls.py (continued)
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('demo/', views.demo_championship_view, name='demo_championship'),
+]
+
+# templates/demo_dashboard.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Championship Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        h1, h2, h3 { margin-top: 30px; }
+        .round, .race, .class, .tier {
+            margin-left: 20px;
+            padding-left: 10px;
+            border-left: 2px solid #ccc;
+        }
+        ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+    <h1>{{ championship.name }}</h1>
+
+    {% for round in championship.rounds %}
+        <div class="round">
+            <h2>Round: {{ round.name }} ({{ round.date }})</h2>
+
+            <h3>Races</h3>
+            <ul>
+            {% for race in round.races %}
+                <li>
+                    <strong>{{ race.name }}</strong>
+                    <div class="race">
+                        Classes:
+                        <ul>
+                        {% for cls in race.classes %}
+                            <li>{{ cls }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+            {% endfor %}
+            </ul>
+
+            <h3>Scheduled Classes</h3>
+            <ul>
+            {% for cls in round.classes %}
+                <li>{{ cls }}</li>
+            {% endfor %}
+            </ul>
+
+            <h3>Pricing Tiers</h3>
+            {% for tier in round.pricing_tiers %}
+                <div class="tier">
+                    <strong>{{ tier.name }}</strong> ({{ tier.start }} to {{ tier.end }})
+                    <ul>
+                    {% for price in tier.prices %}
+                        <li>{{ price.class }} - £{{ price.price }}</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</body>
+</html>

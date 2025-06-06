@@ -1,147 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <title>Organizer Backend Setup</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Championship Setup Overview</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background-color: #f9f9f9;
-      color: #333;
+      font-family: sans-serif;
+      background: #f7f7f7;
+      margin: 0;
+      padding: 20px;
     }
     h1 {
       text-align: center;
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     }
-    details {
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .tab-button {
+      padding: 10px 15px;
       background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      padding: 15px;
-    }
-    summary {
-      font-weight: bold;
-      font-size: 1.2em;
+      border: 1px solid #ccc;
+      border-bottom: none;
+      margin: 0 5px;
       cursor: pointer;
+      border-radius: 6px 6px 0 0;
     }
-    ul {
-      padding-left: 20px;
+    .tab-button.active {
+      font-weight: bold;
+      background: #eaeaea;
     }
-    .section {
-      margin-top: 20px;
+    .tab-content {
+      display: none;
+      background: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 0 0 10px 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
     }
-    code {
-      background-color: #eee;
-      padding: 2px 4px;
-      border-radius: 4px;
+    .tab-content.active {
+      display: block;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
     }
   </style>
 </head>
 <body>
+  <h1>Championship Backend Setup</h1>
+  <div class="tabs">
+    <div class="tab-button active" onclick="showTab(0)">Championship</div>
+    <div class="tab-button" onclick="showTab(1)">Rounds</div>
+    <div class="tab-button" onclick="showTab(2)">Classes</div>
+    <div class="tab-button" onclick="showTab(3)">Schedule</div>
+    <div class="tab-button" onclick="showTab(4)">Races</div>
+    <div class="tab-button" onclick="showTab(5)">Tiers</div>
+    <div class="tab-button" onclick="showTab(6)">Pricing</div>
+  </div>
 
-  <h1>🏁 Organizer Championship Backend Setup</h1>
+  <div class="tab-content active">
+    <label>Championship Name</label>
+    <input type="text" value="2025 National MX Championship" disabled>
+  </div>
 
-  <details open>
-    <summary>1. Championship</summary>
-    <p><strong>Name:</strong> 2025 Spring Championship</p>
-  </details>
+  <div class="tab-content">
+    <label>Round 1</label><input type="text" value="Spring Kickoff - 2025-03-15" disabled>
+    <label>Round 2</label><input type="text" value="Mountain Bash - 2025-04-12" disabled>
+    <label>Round 3</label><input type="text" value="Desert Clash - 2025-05-10" disabled>
+    <label>Round 4</label><input type="text" value="Final Showdown - 2025-06-07" disabled>
+  </div>
 
-  <details open>
-    <summary>2. Rounds</summary>
-    <ul>
-      <li><strong>Opener</strong> – 2025-04-01</li>
-      <li><strong>Final Showdown</strong> – 2025-05-15</li>
-    </ul>
-  </details>
+  <div class="tab-content">
+    <input type="text" value="Junior (Base £30.00)" disabled>
+    <input type="text" value="Senior (Base £40.00)" disabled>
+    <input type="text" value="Expert (Base £50.00)" disabled>
+    <input type="text" value="Veteran (Base £45.00)" disabled>
+    <input type="text" value="Women (Base £35.00)" disabled>
+  </div>
 
-  <details open>
-    <summary>3. Classes</summary>
-    <ul>
-      <li>Junior (£30.00)</li>
-      <li>Senior (£40.00)</li>
-      <li>Expert (£50.00)</li>
-    </ul>
-  </details>
+  <div class="tab-content">
+    <label>Spring Kickoff</label>
+    <select disabled multiple><option selected>Junior</option><option selected>Senior</option><option selected>Women</option></select>
+    <label>Mountain Bash</label>
+    <select disabled multiple><option selected>Junior</option><option selected>Expert</option><option selected>Veteran</option></select>
+    <label>Desert Clash</label>
+    <select disabled multiple><option selected>Senior</option><option selected>Expert</option></select>
+    <label>Final Showdown</label>
+    <select disabled multiple><option selected>Junior</option><option selected>Senior</option><option selected>Expert</option><option selected>Veteran</option><option selected>Women</option></select>
+  </div>
 
-  <details open>
-    <summary>4. Races & Class Assignments</summary>
-    <ul>
-      <li><strong>Junior Heat</strong> → Junior</li>
-      <li><strong>Senior Sprint</strong> → Senior</li>
-      <li><strong>Final Heat</strong> → Expert</li>
-    </ul>
-  </details>
+  <div class="tab-content">
+    <label>Race Name</label>
+    <input type="text" value="Heat 1 - Spring Kickoff" disabled>
+    <label>Class</label><select disabled><option selected>Junior</option></select>
+    <label>Race Name</label>
+    <input type="text" value="Sprint A - Desert Clash" disabled>
+    <label>Class</label><select disabled><option selected>Senior</option></select>
+  </div>
 
-  <details open>
-    <summary>5. Class Schedule (Per Round)</summary>
-    <div class="section">
-      <strong>Opener</strong>
-      <ul>
-        <li>Junior</li>
-        <li>Senior</li>
-      </ul>
-      <strong>Final Showdown</strong>
-      <ul>
-        <li>Senior</li>
-        <li>Expert</li>
-      </ul>
-    </div>
-  </details>
+  <div class="tab-content">
+    <label>Tier for Spring Kickoff</label>
+    <input type="text" value="Early Bird (2025-02-01 to 2025-02-20)" disabled>
+    <input type="text" value="Standard (2025-02-21 to 2025-03-10)" disabled>
+    <input type="text" value="Late (2025-03-11 to 2025-03-14)" disabled>
+    <label>Tier for Final Showdown</label>
+    <input type="text" value="Early Bird (2025-05-01 to 2025-05-20)" disabled>
+    <input type="text" value="Standard (2025-05-21 to 2025-06-05)" disabled>
+  </div>
 
-  <details open>
-    <summary>6. Pricing Tiers</summary>
-    <div class="section">
-      <strong>Opener:</strong>
-      <ul>
-        <li>Early Bird: Mar 1–15</li>
-        <li>Standard: Mar 16–31</li>
-        <li>Late: Apr 1–7</li>
-      </ul>
-      <strong>Final Showdown:</strong>
-      <ul>
-        <li>Early Bird: Apr 10–25</li>
-        <li>Standard: Apr 26–May 10</li>
-      </ul>
-    </div>
-  </details>
+  <div class="tab-content">
+    <label>Early Bird - Spring Kickoff</label>
+    <select disabled multiple><option>Junior - £25.00</option><option>Senior - £35.00</option><option>Women - £28.00</option></select>
+    <label>Standard - Spring Kickoff</label>
+    <select disabled multiple><option>Junior - £30.00</option><option>Senior - £40.00</option><option>Women - £33.00</option></select>
+    <label>Final Showdown - Early Bird</label>
+    <select disabled multiple><option>Expert - £45.00</option><option>Veteran - £42.00</option></select>
+    <label>Final Showdown - Standard</label>
+    <select disabled multiple><option>Expert - £50.00</option><option>Veteran - £47.00</option></select>
+  </div>
 
-  <details open>
-    <summary>7. Class Pricing by Tier</summary>
-    <div class="section">
-      <strong>Opener – Early Bird</strong>
-      <ul>
-        <li>Junior: £25.00</li>
-        <li>Senior: £35.00</li>
-      </ul>
-      <strong>Opener – Standard</strong>
-      <ul>
-        <li>Junior: £30.00</li>
-        <li>Senior: £40.00</li>
-      </ul>
-      <strong>Opener – Late</strong>
-      <ul>
-        <li>Junior: £35.00</li>
-        <li>Senior: £45.00</li>
-      </ul>
-      <strong>Final Showdown – Early Bird</strong>
-      <ul>
-        <li>Senior: £38.00</li>
-        <li>Expert: £45.00</li>
-      </ul>
-      <strong>Final Showdown – Standard</strong>
-      <ul>
-        <li>Senior: £43.00</li>
-        <li>Expert: £50.00</li>
-      </ul>
-    </div>
-  </details>
-
-  <p style="text-align:center; margin-top: 50px;">
-    <em>This page illustrates the data structure managed through the Django backend system for organizers.</em>
-  </p>
-
+  <script>
+    function showTab(index) {
+      document.querySelectorAll('.tab-button').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+      document.querySelectorAll('.tab-content').forEach((tab, i) => {
+        tab.classList.toggle('active', i === index);
+      });
+    }
+  </script>
 </body>
 </html>

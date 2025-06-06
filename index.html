@@ -2,35 +2,144 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Round Registration</title>
+  <title>Championship Setup</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; }
-    h2, h3 { margin-top: 20px; }
-    ul { list-style: none; padding: 0; }
-    li { margin-bottom: 15px; border-bottom: 1px solid #ddd; padding-bottom: 10px; }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    h2 { margin-top: 40px; }
+    form > div { margin-bottom: 20px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input, select, textarea { width: 100%; padding: 8px; }
+    .section { border: 1px solid #ccc; padding: 20px; margin-bottom: 30px; border-radius: 8px; }
   </style>
 </head>
 <body>
 
-  <h2>Register for Spring Open</h2>
-  <p>Event Date: 2025-07-15</p>
+  <h1>Championship Setup</h1>
 
-  <h3>Available Classes</h3>
-  <ul>
-    <li>
-      <strong>Junior Class</strong><br />
-      Base Price: £25.00<br />
-      <span>Current Tier: Early Bird</span><br />
-      <span><strong>Price to Enter: £20.00</strong></span>
-    </li>
-    <li>
-      <strong>Senior Class</strong><br />
-      Base Price: £35.00<br />
-      <span>Current Tier: Standard</span><br />
-      <span><strong>Price to Enter: £35.00</strong></span>
-    </li>
-  </ul>
+  <div class="section">
+    <h2>Create Championship</h2>
+    <form>
+      <label>Championship Name</label>
+      <input type="text" name="championship_name" placeholder="e.g., 2025 Spring Series" />
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Add Rounds</h2>
+    <form>
+      <label>Round Name</label>
+      <input type="text" name="round_name" placeholder="e.g., Round 1 - Opener" />
+
+      <label>Event Date</label>
+      <input type="date" name="round_date" />
+
+      <label>Select Championship</label>
+      <select name="championship">
+        <option>-- Select --</option>
+        <option>2025 Spring Series</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Classes</h2>
+    <form>
+      <label>Class Name</label>
+      <input type="text" name="class_name" placeholder="e.g., Junior" />
+
+      <label>Base Price (£)</label>
+      <input type="number" name="base_price" step="0.01" />
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Schedule Classes for a Round</h2>
+    <form>
+      <label>Select Round</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Round 1 - Opener</option>
+      </select>
+
+      <label>Select Class</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Junior</option>
+        <option>Senior</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Set Pricing Tiers</h2>
+    <form>
+      <label>Tier Name</label>
+      <input type="text" placeholder="e.g., Early Bird" />
+
+      <label>Start Date</label>
+      <input type="date" />
+
+      <label>End Date</label>
+      <input type="date" />
+
+      <label>Round</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Round 1 - Opener</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Set Class Pricing per Tier</h2>
+    <form>
+      <label>Pricing Tier</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Early Bird</option>
+      </select>
+
+      <label>Class</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Junior</option>
+      </select>
+
+      <label>Price (£)</label>
+      <input type="number" step="0.01" />
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Create Races</h2>
+    <form>
+      <label>Race Name</label>
+      <input type="text" placeholder="e.g., Heat A" />
+
+      <label>Round</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Round 1 - Opener</option>
+      </select>
+    </form>
+  </div>
+
+  <div class="section">
+    <h2>Assign Class to Race</h2>
+    <form>
+      <label>Race</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Heat A</option>
+      </select>
+
+      <label>Class</label>
+      <select>
+        <option>-- Select --</option>
+        <option>Junior</option>
+      </select>
+    </form>
+  </div>
 
 </body>
 </html>

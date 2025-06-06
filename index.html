@@ -1,145 +1,121 @@
+# forms.py
+from django import forms
+from .models import (
+    Championship, Round, Class, Race, ClassSchedule,
+    PricingTier, ClassPricing, RaceClass
+)
+
+class ChampionshipForm(forms.ModelForm):
+    class Meta:
+        model = Championship
+        fields = ['name']
+
+class RoundForm(forms.ModelForm):
+    class Meta:
+        model = Round
+        fields = ['name', 'date', 'championship']
+
+class ClassForm(forms.ModelForm):
+    class Meta:
+        model = Class
+        fields = ['name', 'base_price']
+
+class RaceForm(forms.ModelForm):
+    class Meta:
+        model = Race
+        fields = ['name', 'round']
+
+class ClassScheduleForm(forms.ModelForm):
+    class Meta:
+        model = ClassSchedule
+        fields = ['rider_class', 'round']
+
+class PricingTierForm(forms.ModelForm):
+    class Meta:
+        model = PricingTier
+        fields = ['name', 'round', 'start_date', 'end_date']
+
+class ClassPricingForm(forms.ModelForm):
+    class Meta:
+        model = ClassPricing
+        fields = ['pricing_tier', 'rider_class', 'price']
+
+class RaceClassForm(forms.ModelForm):
+    class Meta:
+        model = RaceClass
+        fields = ['race', 'rider_class']
+
+# views.py
+from django.shortcuts import render, redirect
+from .forms import *
+from .models import *
+
+
+def create_entity(request, form_class, template_name, redirect_name):
+    if request.method == 'POST':
+        form = form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(redirect_name)
+    else:
+        form = form_class()
+    return render(request, template_name, {'form': form})
+
+
+def create_championship(request):
+    return create_entity(request, ChampionshipForm, 'create.html', 'create_championship')
+
+def create_round(request):
+    return create_entity(request, RoundForm, 'create.html', 'create_round')
+
+def create_class(request):
+    return create_entity(request, ClassForm, 'create.html', 'create_class')
+
+def create_race(request):
+    return create_entity(request, RaceForm, 'create.html', 'create_race')
+
+def create_class_schedule(request):
+    return create_entity(request, ClassScheduleForm, 'create.html', 'create_class_schedule')
+
+def create_pricing_tier(request):
+    return create_entity(request, PricingTierForm, 'create.html', 'create_pricing_tier')
+
+def create_class_pricing(request):
+    return create_entity(request, ClassPricingForm, 'create.html', 'create_class_pricing')
+
+def create_race_class(request):
+    return create_entity(request, RaceClassForm, 'create.html', 'create_race_class')
+
+# urls.py
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('championship/create/', views.create_championship, name='create_championship'),
+    path('round/create/', views.create_round, name='create_round'),
+    path('class/create/', views.create_class, name='create_class'),
+    path('race/create/', views.create_race, name='create_race'),
+    path('class_schedule/create/', views.create_class_schedule, name='create_class_schedule'),
+    path('pricing_tier/create/', views.create_pricing_tier, name='create_pricing_tier'),
+    path('class_pricing/create/', views.create_class_pricing, name='create_class_pricing'),
+    path('race_class/create/', views.create_race_class, name='create_race_class'),
+]
+
+# templates/create.html
+<!-- All forms share this one template -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Championship Setup</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h2 { margin-top: 40px; }
-    form > div { margin-bottom: 20px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input, select, textarea { width: 100%; padding: 8px; }
-    .section { border: 1px solid #ccc; padding: 20px; margin-bottom: 30px; border-radius: 8px; }
-  </style>
+    <title>Create</title>
 </head>
 <body>
-
-  <h1>Championship Setup</h1>
-
-  <div class="section">
-    <h2>Create Championship</h2>
-    <form>
-      <label>Championship Name</label>
-      <input type="text" name="championship_name" placeholder="e.g., 2025 Spring Series" />
+    <h1>Create Entry</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Save</button>
     </form>
-  </div>
-
-  <div class="section">
-    <h2>Add Rounds</h2>
-    <form>
-      <label>Round Name</label>
-      <input type="text" name="round_name" placeholder="e.g., Round 1 - Opener" />
-
-      <label>Event Date</label>
-      <input type="date" name="round_date" />
-
-      <label>Select Championship</label>
-      <select name="championship">
-        <option>-- Select --</option>
-        <option>2025 Spring Series</option>
-      </select>
-    </form>
-  </div>
-
-  <div class="section">
-    <h2>Classes</h2>
-    <form>
-      <label>Class Name</label>
-      <input type="text" name="class_name" placeholder="e.g., Junior" />
-
-      <label>Base Price (£)</label>
-      <input type="number" name="base_price" step="0.01" />
-    </form>
-  </div>
-
-  <div class="section">
-    <h2>Schedule Classes for a Round</h2>
-    <form>
-      <label>Select Round</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Round 1 - Opener</option>
-      </select>
-
-      <label>Select Class</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Junior</option>
-        <option>Senior</option>
-      </select>
-    </form>
-  </div>
-
-  <div class="section">
-    <h2>Set Pricing Tiers</h2>
-    <form>
-      <label>Tier Name</label>
-      <input type="text" placeholder="e.g., Early Bird" />
-
-      <label>Start Date</label>
-      <input type="date" />
-
-      <label>End Date</label>
-      <input type="date" />
-
-      <label>Round</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Round 1 - Opener</option>
-      </select>
-    </form>
-  </div>
-
-  <div class="section">
-    <h2>Set Class Pricing per Tier</h2>
-    <form>
-      <label>Pricing Tier</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Early Bird</option>
-      </select>
-
-      <label>Class</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Junior</option>
-      </select>
-
-      <label>Price (£)</label>
-      <input type="number" step="0.01" />
-    </form>
-  </div>
-
-  <div class="section">
-    <h2>Create Races</h2>
-    <form>
-      <label>Race Name</label>
-      <input type="text" placeholder="e.g., Heat A" />
-
-      <label>Round</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Round 1 - Opener</option>
-      </select>
-    </form>
-  </div>
-
-  <div class="section">
-    <h2>Assign Class to Race</h2>
-    <form>
-      <label>Race</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Heat A</option>
-      </select>
-
-      <label>Class</label>
-      <select>
-        <option>-- Select --</option>
-        <option>Junior</option>
-      </select>
-    </form>
-  </div>
-
+    <a href="/">Back to dashboard</a>
 </body>
 </html>
+

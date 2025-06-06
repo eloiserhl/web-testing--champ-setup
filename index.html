@@ -57,24 +57,26 @@
       border-radius: 5px;
     }
     .sub-section {
-      margin-left: 20px;
       margin-top: 10px;
-      padding-left: 15px;
-      border-left: 2px solid #eee;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .price-box {
+      border: 1px solid #ccc;
+      padding: 10px;
+      border-radius: 8px;
+      background: #fdfdfd;
+      min-width: 200px;
+      flex: 1;
+    }
+    .price-box h4 {
+      margin: 0 0 10px;
     }
     .date-info {
       font-style: italic;
       color: #555;
-      margin-top: 5px;
-    }
-    ul {
-      margin-top: 5px;
-      padding-left: 20px;
-    }
-    .price-list {
-      margin-top: 5px;
-      font-size: 0.95em;
-      padding-left: 15px;
+      font-size: 0.9em;
     }
     .class-list {
       font-size: 0.95em;
@@ -119,18 +121,21 @@
         <strong>Classes Racing:</strong> Junior, Senior, Women
       </div>
       <div class="sub-section">
-        <label>Pricing Tiers:</label>
-        <ul>
-          <li>Early Bird (2025-02-01 to 2025-02-20)
-            <div class="price-list">Junior - £25.00, Senior - £35.00, Women - £28.00</div>
-          </li>
-          <li>Standard (2025-02-21 to 2025-03-10)
-            <div class="price-list">Junior - £30.00, Senior - £40.00, Women - £33.00</div>
-          </li>
-          <li>Late (2025-03-11 to 2025-03-14)
-            <div class="price-list">Junior - £35.00, Senior - £45.00, Women - £38.00</div>
-          </li>
-        </ul>
+        <div class="price-box">
+          <h4>Early Bird</h4>
+          <div class="date-info">2025-02-01 to 2025-02-20</div>
+          Junior - £25.00<br>Senior - £35.00<br>Women - £28.00
+        </div>
+        <div class="price-box">
+          <h4>Standard</h4>
+          <div class="date-info">2025-02-21 to 2025-03-10</div>
+          Junior - £30.00<br>Senior - £40.00<br>Women - £33.00
+        </div>
+        <div class="price-box">
+          <h4>Late</h4>
+          <div class="date-info">2025-03-11 to 2025-03-14</div>
+          Junior - £35.00<br>Senior - £45.00<br>Women - £38.00
+        </div>
       </div>
     </div>
 
@@ -141,15 +146,16 @@
         <strong>Classes Racing:</strong> Junior, Expert
       </div>
       <div class="sub-section">
-        <label>Pricing Tiers:</label>
-        <ul>
-          <li>Early Bird (2025-03-13 to 2025-03-31)
-            <div class="price-list">Junior - £28.00, Expert - £45.00</div>
-          </li>
-          <li>Standard (2025-04-01 to 2025-04-10)
-            <div class="price-list">Junior - £33.00, Expert - £50.00</div>
-          </li>
-        </ul>
+        <div class="price-box">
+          <h4>Early Bird</h4>
+          <div class="date-info">2025-03-13 to 2025-03-31</div>
+          Junior - £28.00<br>Expert - £45.00
+        </div>
+        <div class="price-box">
+          <h4>Standard</h4>
+          <div class="date-info">2025-04-01 to 2025-04-10</div>
+          Junior - £33.00<br>Expert - £50.00
+        </div>
       </div>
     </div>
 
@@ -160,15 +166,16 @@
         <strong>Classes Racing:</strong> Senior, Expert
       </div>
       <div class="sub-section">
-        <label>Pricing Tiers:</label>
-        <ul>
-          <li>Standard (2025-04-15 to 2025-05-05)
-            <div class="price-list">Senior - £38.00, Expert - £45.00</div>
-          </li>
-          <li>Late (2025-05-06 to 2025-05-09)
-            <div class="price-list">Senior - £43.00, Expert - £50.00</div>
-          </li>
-        </ul>
+        <div class="price-box">
+          <h4>Standard</h4>
+          <div class="date-info">2025-04-15 to 2025-05-05</div>
+          Senior - £38.00<br>Expert - £45.00
+        </div>
+        <div class="price-box">
+          <h4>Late</h4>
+          <div class="date-info">2025-05-06 to 2025-05-09</div>
+          Senior - £43.00<br>Expert - £50.00
+        </div>
       </div>
     </div>
 
@@ -179,15 +186,16 @@
         <strong>Classes Racing:</strong> Veteran, Expert, Junior
       </div>
       <div class="sub-section">
-        <label>Pricing Tiers:</label>
-        <ul>
-          <li>Early Bird (2025-05-01 to 2025-05-20)
-            <div class="price-list">Veteran - £42.00, Expert - £45.00</div>
-          </li>
-          <li>Standard (2025-05-21 to 2025-06-05)
-            <div class="price-list">Veteran - £47.00, Expert - £50.00</div>
-          </li>
-        </ul>
+        <div class="price-box">
+          <h4>Early Bird</h4>
+          <div class="date-info">2025-05-01 to 2025-05-20</div>
+          Veteran - £42.00<br>Expert - £45.00
+        </div>
+        <div class="price-box">
+          <h4>Standard</h4>
+          <div class="date-info">2025-05-21 to 2025-06-05</div>
+          Veteran - £47.00<br>Expert - £50.00
+        </div>
       </div>
     </div>
   </div>
@@ -220,4 +228,5 @@
   </script>
 </body>
 </html>
+
 

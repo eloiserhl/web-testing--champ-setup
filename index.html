@@ -1,121 +1,67 @@
-# forms.py
-from django import forms
-from .models import (
-    Championship, Round, Class, Race, ClassSchedule,
-    PricingTier, ClassPricing, RaceClass
+# management/commands/load_championship_demo.py
+from django.core.management.base import BaseCommand
+from app.models import (
+    Championship, Round, Race, Class, RaceClass,
+    ClassSchedule, PricingTier, ClassPricing
 )
+from datetime import date
 
-class ChampionshipForm(forms.ModelForm):
-    class Meta:
-        model = Championship
-        fields = ['name']
+class Command(BaseCommand):
+    help = "Load example championship structure with related data"
 
-class RoundForm(forms.ModelForm):
-    class Meta:
-        model = Round
-        fields = ['name', 'date', 'championship']
+    def handle(self, *args, **kwargs):
+        # Clear existing data
+        Championship.objects.all().delete()
+        Class.objects.all().delete()
 
-class ClassForm(forms.ModelForm):
-    class Meta:
-        model = Class
-        fields = ['name', 'base_price']
+        # Create Championship
+        champ = Championship.objects.create(name="2025 Spring Championship")
 
-class RaceForm(forms.ModelForm):
-    class Meta:
-        model = Race
-        fields = ['name', 'round']
+        # Create Rounds
+        round1 = Round.objects.create(name="Opener", date=date(2025, 4, 1), championship=champ)
+        round2 = Round.objects.create(name="Final Showdown", date=date(2025, 5, 15), championship=champ)
 
-class ClassScheduleForm(forms.ModelForm):
-    class Meta:
-        model = ClassSchedule
-        fields = ['rider_class', 'round']
+        # Create Classes
+        junior = Class.objects.create(name="Junior", base_price=30.00)
+        senior = Class.objects.create(name="Senior", base_price=40.00)
+        expert = Class.objects.create(name="Expert", base_price=50.00)
 
-class PricingTierForm(forms.ModelForm):
-    class Meta:
-        model = PricingTier
-        fields = ['name', 'round', 'start_date', 'end_date']
+        # Create Races
+        race_a = Race.objects.create(name="Junior Heat", round=round1)
+        race_b = Race.objects.create(name="Senior Sprint", round=round1)
+        race_c = Race.objects.create(name="Final Heat", round=round2)
 
-class ClassPricingForm(forms.ModelForm):
-    class Meta:
-        model = ClassPricing
-        fields = ['pricing_tier', 'rider_class', 'price']
+        # Assign Race Classes
+        RaceClass.objects.create(race=race_a, rider_class=junior)
+        RaceClass.objects.create(race=race_b, rider_class=senior)
+        RaceClass.objects.create(race=race_c, rider_class=expert)
 
-class RaceClassForm(forms.ModelForm):
-    class Meta:
-        model = RaceClass
-        fields = ['race', 'rider_class']
+        # Schedule Classes
+        ClassSchedule.objects.create(round=round1, rider_class=junior)
+        ClassSchedule.objects.create(round=round1, rider_class=senior)
+        ClassSchedule.objects.create(round=round2, rider_class=senior)
+        ClassSchedule.objects.create(round=round2, rider_class=expert)
 
-# views.py
-from django.shortcuts import render, redirect
-from .forms import *
-from .models import *
+        # Create Pricing Tiers
+        tier1a = PricingTier.objects.create(name="Early Bird", round=round1, start_date=date(2025, 3, 1), end_date=date(2025, 3, 15))
+        tier1b = PricingTier.objects.create(name="Standard", round=round1, start_date=date(2025, 3, 16), end_date=date(2025, 3, 31))
+        tier1c = PricingTier.objects.create(name="Late", round=round1, start_date=date(2025, 4, 1), end_date=date(2025, 4, 7))
 
+        tier2a = PricingTier.objects.create(name="Early Bird", round=round2, start_date=date(2025, 4, 10), end_date=date(2025, 4, 25))
+        tier2b = PricingTier.objects.create(name="Standard", round=round2, start_date=date(2025, 4, 26), end_date=date(2025, 5, 10))
 
-def create_entity(request, form_class, template_name, redirect_name):
-    if request.method == 'POST':
-        form = form_class(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect(redirect_name)
-    else:
-        form = form_class()
-    return render(request, template_name, {'form': form})
+        # Class Pricing - Round 1
+        ClassPricing.objects.create(pricing_tier=tier1a, rider_class=junior, price=25.00)
+        ClassPricing.objects.create(pricing_tier=tier1a, rider_class=senior, price=35.00)
+        ClassPricing.objects.create(pricing_tier=tier1b, rider_class=junior, price=30.00)
+        ClassPricing.objects.create(pricing_tier=tier1b, rider_class=senior, price=40.00)
+        ClassPricing.objects.create(pricing_tier=tier1c, rider_class=junior, price=35.00)
+        ClassPricing.objects.create(pricing_tier=tier1c, rider_class=senior, price=45.00)
 
+        # Class Pricing - Round 2
+        ClassPricing.objects.create(pricing_tier=tier2a, rider_class=senior, price=38.00)
+        ClassPricing.objects.create(pricing_tier=tier2a, rider_class=expert, price=45.00)
+        ClassPricing.objects.create(pricing_tier=tier2b, rider_class=senior, price=43.00)
+        ClassPricing.objects.create(pricing_tier=tier2b, rider_class=expert, price=50.00)
 
-def create_championship(request):
-    return create_entity(request, ChampionshipForm, 'create.html', 'create_championship')
-
-def create_round(request):
-    return create_entity(request, RoundForm, 'create.html', 'create_round')
-
-def create_class(request):
-    return create_entity(request, ClassForm, 'create.html', 'create_class')
-
-def create_race(request):
-    return create_entity(request, RaceForm, 'create.html', 'create_race')
-
-def create_class_schedule(request):
-    return create_entity(request, ClassScheduleForm, 'create.html', 'create_class_schedule')
-
-def create_pricing_tier(request):
-    return create_entity(request, PricingTierForm, 'create.html', 'create_pricing_tier')
-
-def create_class_pricing(request):
-    return create_entity(request, ClassPricingForm, 'create.html', 'create_class_pricing')
-
-def create_race_class(request):
-    return create_entity(request, RaceClassForm, 'create.html', 'create_race_class')
-
-# urls.py
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('championship/create/', views.create_championship, name='create_championship'),
-    path('round/create/', views.create_round, name='create_round'),
-    path('class/create/', views.create_class, name='create_class'),
-    path('race/create/', views.create_race, name='create_race'),
-    path('class_schedule/create/', views.create_class_schedule, name='create_class_schedule'),
-    path('pricing_tier/create/', views.create_pricing_tier, name='create_pricing_tier'),
-    path('class_pricing/create/', views.create_class_pricing, name='create_class_pricing'),
-    path('race_class/create/', views.create_race_class, name='create_race_class'),
-]
-
-# templates/create.html
-<!-- All forms share this one template -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Create</title>
-</head>
-<body>
-    <h1>Create Entry</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Save</button>
-    </form>
-    <a href="/">Back to dashboard</a>
-</body>
-</html>
-
+        self.stdout.write(self.style.SUCCESS('Demo championship data loaded successfully.'))

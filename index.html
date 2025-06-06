@@ -1,184 +1,147 @@
-# management/commands/load_championship_demo.py
-from django.core.management.base import BaseCommand
-from app.models import (
-    Championship, Round, Race, Class, RaceClass,
-    ClassSchedule, PricingTier, ClassPricing
-)
-from datetime import date
-
-class Command(BaseCommand):
-    help = "Load example championship structure with related data"
-
-    def handle(self, *args, **kwargs):
-        Championship.objects.all().delete()
-        Class.objects.all().delete()
-
-        champ = Championship.objects.create(name="2025 Spring Championship")
-
-        round1 = Round.objects.create(name="Opener", date=date(2025, 4, 1), championship=champ)
-        round2 = Round.objects.create(name="Final Showdown", date=date(2025, 5, 15), championship=champ)
-
-        junior = Class.objects.create(name="Junior", base_price=30.00)
-        senior = Class.objects.create(name="Senior", base_price=40.00)
-        expert = Class.objects.create(name="Expert", base_price=50.00)
-
-        race_a = Race.objects.create(name="Junior Heat", round=round1)
-        race_b = Race.objects.create(name="Senior Sprint", round=round1)
-        race_c = Race.objects.create(name="Final Heat", round=round2)
-
-        RaceClass.objects.create(race=race_a, rider_class=junior)
-        RaceClass.objects.create(race=race_b, rider_class=senior)
-        RaceClass.objects.create(race=race_c, rider_class=expert)
-
-        ClassSchedule.objects.create(round=round1, rider_class=junior)
-        ClassSchedule.objects.create(round=round1, rider_class=senior)
-        ClassSchedule.objects.create(round=round2, rider_class=senior)
-        ClassSchedule.objects.create(round=round2, rider_class=expert)
-
-        tier1a = PricingTier.objects.create(name="Early Bird", round=round1, start_date=date(2025, 3, 1), end_date=date(2025, 3, 15))
-        tier1b = PricingTier.objects.create(name="Standard", round=round1, start_date=date(2025, 3, 16), end_date=date(2025, 3, 31))
-        tier1c = PricingTier.objects.create(name="Late", round=round1, start_date=date(2025, 4, 1), end_date=date(2025, 4, 7))
-
-        tier2a = PricingTier.objects.create(name="Early Bird", round=round2, start_date=date(2025, 4, 10), end_date=date(2025, 4, 25))
-        tier2b = PricingTier.objects.create(name="Standard", round=round2, start_date=date(2025, 4, 26), end_date=date(2025, 5, 10))
-
-        ClassPricing.objects.create(pricing_tier=tier1a, rider_class=junior, price=25.00)
-        ClassPricing.objects.create(pricing_tier=tier1a, rider_class=senior, price=35.00)
-        ClassPricing.objects.create(pricing_tier=tier1b, rider_class=junior, price=30.00)
-        ClassPricing.objects.create(pricing_tier=tier1b, rider_class=senior, price=40.00)
-        ClassPricing.objects.create(pricing_tier=tier1c, rider_class=junior, price=35.00)
-        ClassPricing.objects.create(pricing_tier=tier1c, rider_class=senior, price=45.00)
-
-        ClassPricing.objects.create(pricing_tier=tier2a, rider_class=senior, price=38.00)
-        ClassPricing.objects.create(pricing_tier=tier2a, rider_class=expert, price=45.00)
-        ClassPricing.objects.create(pricing_tier=tier2b, rider_class=senior, price=43.00)
-        ClassPricing.objects.create(pricing_tier=tier2b, rider_class=expert, price=50.00)
-
-        self.stdout.write(self.style.SUCCESS('Demo championship data loaded successfully.'))
-
-
-# views.py (continued)
-from django.shortcuts import render
-from django.http import JsonResponse
-from app.models import Championship
-
-def demo_championship_view(request):
-    champ = Championship.objects.prefetch_related(
-        'rounds__races__race_classes__rider_class',
-        'rounds__pricing_tiers__class_prices__rider_class',
-        'rounds__class_schedules__rider_class'
-    ).first()
-
-    if not champ:
-        return JsonResponse({"error": "No championship found."}, status=404)
-
-    data = {
-        "name": champ.name,
-        "rounds": []
-    }
-
-    for rnd in champ.rounds.all():
-        round_data = {
-            "name": rnd.name,
-            "date": rnd.date,
-            "races": [],
-            "classes": list(set(
-                cs.rider_class.name for cs in rnd.class_schedules.all()
-            )),
-            "pricing_tiers": []
-        }
-
-        for race in rnd.races.all():
-            race_data = {
-                "name": race.name,
-                "classes": [rc.rider_class.name for rc in race.race_classes.all()]
-            }
-            round_data["races"].append(race_data)
-
-        for tier in rnd.pricing_tiers.all():
-            tier_data = {
-                "name": tier.name,
-                "start": tier.start_date,
-                "end": tier.end_date,
-                "prices": [
-                    {"class": cp.rider_class.name, "price": float(cp.price)}
-                    for cp in tier.class_prices.all()
-                ]
-            }
-            round_data["pricing_tiers"].append(tier_data)
-
-        data["rounds"].append(round_data)
-
-    return render(request, 'demo_dashboard.html', {'championship': data})
-
-# urls.py (continued)
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('demo/', views.demo_championship_view, name='demo_championship'),
-]
-
-# templates/demo_dashboard.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Championship Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        h1, h2, h3 { margin-top: 30px; }
-        .round, .race, .class, .tier {
-            margin-left: 20px;
-            padding-left: 10px;
-            border-left: 2px solid #ccc;
-        }
-        ul { padding-left: 20px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Championship Setup Overview</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    details {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      padding: 15px;
+    }
+    summary {
+      font-weight: bold;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .section {
+      margin-top: 20px;
+    }
+    code {
+      background-color: #eee;
+      padding: 2px 4px;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
-    <h1>{{ championship.name }}</h1>
 
-    {% for round in championship.rounds %}
-        <div class="round">
-            <h2>Round: {{ round.name }} ({{ round.date }})</h2>
+  <h1>🏁 Organizer Championship Backend Setup</h1>
 
-            <h3>Races</h3>
-            <ul>
-            {% for race in round.races %}
-                <li>
-                    <strong>{{ race.name }}</strong>
-                    <div class="race">
-                        Classes:
-                        <ul>
-                        {% for cls in race.classes %}
-                            <li>{{ cls }}</li>
-                        {% endfor %}
-                        </ul>
-                    </div>
-                </li>
-            {% endfor %}
-            </ul>
+  <details open>
+    <summary>1. Championship</summary>
+    <p><strong>Name:</strong> 2025 Spring Championship</p>
+  </details>
 
-            <h3>Scheduled Classes</h3>
-            <ul>
-            {% for cls in round.classes %}
-                <li>{{ cls }}</li>
-            {% endfor %}
-            </ul>
+  <details open>
+    <summary>2. Rounds</summary>
+    <ul>
+      <li><strong>Opener</strong> – 2025-04-01</li>
+      <li><strong>Final Showdown</strong> – 2025-05-15</li>
+    </ul>
+  </details>
 
-            <h3>Pricing Tiers</h3>
-            {% for tier in round.pricing_tiers %}
-                <div class="tier">
-                    <strong>{{ tier.name }}</strong> ({{ tier.start }} to {{ tier.end }})
-                    <ul>
-                    {% for price in tier.prices %}
-                        <li>{{ price.class }} - £{{ price.price }}</li>
-                    {% endfor %}
-                    </ul>
-                </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
+  <details open>
+    <summary>3. Classes</summary>
+    <ul>
+      <li>Junior (£30.00)</li>
+      <li>Senior (£40.00)</li>
+      <li>Expert (£50.00)</li>
+    </ul>
+  </details>
+
+  <details open>
+    <summary>4. Races & Class Assignments</summary>
+    <ul>
+      <li><strong>Junior Heat</strong> → Junior</li>
+      <li><strong>Senior Sprint</strong> → Senior</li>
+      <li><strong>Final Heat</strong> → Expert</li>
+    </ul>
+  </details>
+
+  <details open>
+    <summary>5. Class Schedule (Per Round)</summary>
+    <div class="section">
+      <strong>Opener</strong>
+      <ul>
+        <li>Junior</li>
+        <li>Senior</li>
+      </ul>
+      <strong>Final Showdown</strong>
+      <ul>
+        <li>Senior</li>
+        <li>Expert</li>
+      </ul>
+    </div>
+  </details>
+
+  <details open>
+    <summary>6. Pricing Tiers</summary>
+    <div class="section">
+      <strong>Opener:</strong>
+      <ul>
+        <li>Early Bird: Mar 1–15</li>
+        <li>Standard: Mar 16–31</li>
+        <li>Late: Apr 1–7</li>
+      </ul>
+      <strong>Final Showdown:</strong>
+      <ul>
+        <li>Early Bird: Apr 10–25</li>
+        <li>Standard: Apr 26–May 10</li>
+      </ul>
+    </div>
+  </details>
+
+  <details open>
+    <summary>7. Class Pricing by Tier</summary>
+    <div class="section">
+      <strong>Opener – Early Bird</strong>
+      <ul>
+        <li>Junior: £25.00</li>
+        <li>Senior: £35.00</li>
+      </ul>
+      <strong>Opener – Standard</strong>
+      <ul>
+        <li>Junior: £30.00</li>
+        <li>Senior: £40.00</li>
+      </ul>
+      <strong>Opener – Late</strong>
+      <ul>
+        <li>Junior: £35.00</li>
+        <li>Senior: £45.00</li>
+      </ul>
+      <strong>Final Showdown – Early Bird</strong>
+      <ul>
+        <li>Senior: £38.00</li>
+        <li>Expert: £45.00</li>
+      </ul>
+      <strong>Final Showdown – Standard</strong>
+      <ul>
+        <li>Senior: £43.00</li>
+        <li>Expert: £50.00</li>
+      </ul>
+    </div>
+  </details>
+
+  <p style="text-align:center; margin-top: 50px;">
+    <em>This page illustrates the data structure managed through the Django backend system for organizers.</em>
+  </p>
+
 </body>
 </html>

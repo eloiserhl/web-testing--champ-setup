@@ -87,43 +87,18 @@
       margin-top: 20px;
       background: #fafafa;
     }
-    .overview-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 10px;
-    }
-    .overview-table th, .overview-table td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: left;
-    }
-    .overview-table th {
-      background: #eee;
-    }
   </style>
 </head>
 <body>
   <h1>Organizer Backend Setup</h1>
   <div class="tabs">
-    <button class="tab-button active" onclick="showTab(0)">Overview</button>
-    <button class="tab-button" onclick="showTab(1)">Championship</button>
-    <button class="tab-button" onclick="showTab(2)">Rounds</button>
-    <button class="tab-button" onclick="showTab(3)">Classes</button>
-    <button class="tab-button" onclick="showTab(4)">Races</button>
+    <button class="tab-button active" onclick="showTab(0)">Championship</button>
+    <button class="tab-button" onclick="showTab(1)">Rounds</button>
+    <button class="tab-button" onclick="showTab(2)">Classes</button>
+    <button class="tab-button" onclick="showTab(3)">Races</button>
   </div>
 
   <div class="tab-content active">
-    <h2>Rounds Summary</h2>
-    <table class="overview-table">
-      <tr><th>Round</th><th>Date</th><th>Classes</th><th>Races</th></tr>
-      <tr><td>Spring Kickoff</td><td>2025-03-15</td><td>Junior, Senior, Women</td><td>Heat 1</td></tr>
-      <tr><td>Mountain Bash</td><td>2025-04-12</td><td>Junior, Expert</td><td>-</td></tr>
-      <tr><td>Desert Clash</td><td>2025-05-10</td><td>Senior, Expert</td><td>Sprint A</td></tr>
-      <tr><td>Final Showdown</td><td>2025-06-07</td><td>Veteran, Expert, Junior</td><td>-</td></tr>
-    </table>
-  </div>
-
-  <div class="tab-content">
     <label>Championship Name</label>
     <input type="text" value="2025 National MX Championship" readonly>
 
@@ -137,8 +112,84 @@
   </div>
 
   <div class="tab-content">
-    <!-- Round blocks inserted here -->
-    <!-- Use same blocks from previous implementation -->
+    <div class="round-block">
+      <label>Spring Kickoff</label>
+      <input type="text" value="Date: 2025-03-15" readonly>
+      <div class="class-list">
+        <strong>Classes Racing:</strong> Junior, Senior, Women
+      </div>
+      <div class="sub-section">
+        <label>Pricing Tiers:</label>
+        <ul>
+          <li>Early Bird (2025-02-01 to 2025-02-20)
+            <div class="price-list">Junior - £25.00, Senior - £35.00, Women - £28.00</div>
+          </li>
+          <li>Standard (2025-02-21 to 2025-03-10)
+            <div class="price-list">Junior - £30.00, Senior - £40.00, Women - £33.00</div>
+          </li>
+          <li>Late (2025-03-11 to 2025-03-14)
+            <div class="price-list">Junior - £35.00, Senior - £45.00, Women - £38.00</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="round-block">
+      <label>Mountain Bash</label>
+      <input type="text" value="Date: 2025-04-12" readonly>
+      <div class="class-list">
+        <strong>Classes Racing:</strong> Junior, Expert
+      </div>
+      <div class="sub-section">
+        <label>Pricing Tiers:</label>
+        <ul>
+          <li>Early Bird (2025-03-13 to 2025-03-31)
+            <div class="price-list">Junior - £28.00, Expert - £45.00</div>
+          </li>
+          <li>Standard (2025-04-01 to 2025-04-10)
+            <div class="price-list">Junior - £33.00, Expert - £50.00</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="round-block">
+      <label>Desert Clash</label>
+      <input type="text" value="Date: 2025-05-10" readonly>
+      <div class="class-list">
+        <strong>Classes Racing:</strong> Senior, Expert
+      </div>
+      <div class="sub-section">
+        <label>Pricing Tiers:</label>
+        <ul>
+          <li>Standard (2025-04-15 to 2025-05-05)
+            <div class="price-list">Senior - £38.00, Expert - £45.00</div>
+          </li>
+          <li>Late (2025-05-06 to 2025-05-09)
+            <div class="price-list">Senior - £43.00, Expert - £50.00</div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="round-block">
+      <label>Final Showdown</label>
+      <input type="text" value="Date: 2025-06-07" readonly>
+      <div class="class-list">
+        <strong>Classes Racing:</strong> Veteran, Expert, Junior
+      </div>
+      <div class="sub-section">
+        <label>Pricing Tiers:</label>
+        <ul>
+          <li>Early Bird (2025-05-01 to 2025-05-20)
+            <div class="price-list">Veteran - £42.00, Expert - £45.00</div>
+          </li>
+          <li>Standard (2025-05-21 to 2025-06-05)
+            <div class="price-list">Veteran - £47.00, Expert - £50.00</div>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 
   <div class="tab-content">
@@ -169,3 +220,4 @@
   </script>
 </body>
 </html>
+
